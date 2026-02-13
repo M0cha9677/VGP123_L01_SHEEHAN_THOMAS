@@ -1,0 +1,23 @@
+# --- Unity project is inside /VGP123Game ---
+
+# Unity generated (inside VGP123Game)
+VGP123Game/[Ll]ibrary/
+VGP123Game/[Tt]emp/
+VGP123Game/[Oo]bj/
+VGP123Game/[Bb]uild/
+VGP123Game/[Bb]uilds/
+VGP123Game/[Ll]ogs/
+VGP123Game/UserSettings/
+VGP123Game/MemoryCaptures/
+
+# IDE junk (inside VGP123Game)
+VGP123Game/.vs/
+VGP123Game/*.csproj
+VGP123Game/*.sln
+VGP123Game/*.slnx
+VGP123Game/*.user
+VGP123Game/*.userprefs
+
+# OS junk
+.DS_Store
+Thumbs.db
