@@ -5,7 +5,7 @@ public class PlayerMovement2D : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     [Header("Movement")]
     public float moveSpeed = 7f;
-    public float jumpForce = 5f;
+    public float jumpForce = 12f;
 
     [Header("Ground Check")]
     public Transform groundCheck; // Empty child at feet
