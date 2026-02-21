@@ -15,15 +15,18 @@ public class PlayerMovement2D : MonoBehaviour
     private Rigidbody2D rb;
     private float moveInput;
     private bool isGrounded;
+    private PlayerFacing facing;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        facing = GetComponent<PlayerFacing>();
     }
 
     private void Update()
     {
         moveInput = Input.GetAxisRaw("Horizontal"); // A/D or Left/Right
+        facing.SetFacingFromInput(moveInput);
 
         // Ground Check
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
