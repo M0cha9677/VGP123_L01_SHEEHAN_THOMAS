@@ -1,5 +1,8 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D), typeof(SpriteRenderer))]
+[RequireComponent(typeof(Animator))]
+
 public class PlayerMovement2D : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -14,8 +17,9 @@ public class PlayerMovement2D : MonoBehaviour
 
     private Rigidbody2D rb;
     private float moveInput;
-    private bool isGrounded;
+    private bool isGrounded = false;
     private PlayerFacing facing;
+    private Animator anim;
 
     private void Awake()
     {
@@ -50,7 +54,7 @@ public class PlayerMovement2D : MonoBehaviour
         if (groundCheck == null) return;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
-
+    
     void Start()
     {
 
