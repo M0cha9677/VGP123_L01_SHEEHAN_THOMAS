@@ -2,47 +2,68 @@ using UnityEngine;
 
 public class PlayerShoot : MonoBehaviour
 {
-    [Header("Setup")]
+    [Header("Refs")]
     [SerializeField] private Projectile2D _projectilePrefab;
     [SerializeField] private Transform _firePoint;
-    [SerializeField] private PlayerMovement2D _facing;
     [SerializeField] private Animator _anim;
 
     [Header("Tuning")]
     [SerializeField] private float _fireCooldown = 0.25f;
 
-    private float _lastFireTime;
+    private PlayerMovement2D _move;
+    private Collider2D _playerCol;
+
+    private bool _canShoot;
+    private float _nextFireTime;
 
     private void Awake()
     {
-        if (_facing == null) _facing = GetComponent<PlayerMovement2D>();
+        _move = GetComponent<PlayerMovement2D>();
+        _playerCol = GetComponent<Collider2D>();
         if (_anim == null) _anim = GetComponent<Animator>();
+    }
+
+    public void EnableShooting()
+    {
+        _canShoot = true;
+        Debug.Log("Shooting enabled!");
     }
 
     private void Update()
     {
-        bool holdingShoot = Input.GetKey(KeyCode.F);
+        bool holding = Input.GetKey(KeyCode.F);
 
-        // 1️⃣ Control animation directly from key state
         if (_anim != null)
-            _anim.SetBool("isShooting", holdingShoot);
+            _anim.SetBool("isShooting", _canShoot && holding);
 
-        // 2️⃣ Fire projectile on cooldown while key held
-        if (holdingShoot && Time.time >= _lastFireTime + _fireCooldown)
-        {
-            _lastFireTime = Time.time;
-            Shoot();
-        }
+        if (!_canShoot) return;
+        if (!holding) return;
+
+        if (Time.time < _nextFireTime) return;
+        _nextFireTime = Time.time + _fireCooldown;
+
+        ShootOnce();
     }
 
-    private void Shoot()
+    private void ShootOnce()
     {
-        Vector2 dir = (_facing != null && _facing.FacingRight)
-            ? Vector2.right
-            : Vector2.left;
+        if (_projectilePrefab == null || _firePoint == null || _move == null)
+        {
+            Debug.LogError("PlayerShoot missing refs: projectile/firePoint/move.");
+            return;
+        }
 
-        var proj = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
+        Vector2 dir = _move.FacingRight ? Vector2.right : Vector2.left;
+
+        // small forward offset so it doesn't spawn inside colliders
+        Vector3 spawnPos = _firePoint.position + (Vector3)(dir * 0.1f);
+
+        var proj = Instantiate(_projectilePrefab, spawnPos, Quaternion.identity);
+
+        var projCol = proj.GetComponent<Collider2D>();
+        if (projCol != null && _playerCol != null)
+            Physics2D.IgnoreCollision(projCol, _playerCol);
+
         proj.Fire(dir);
     }
-
 }

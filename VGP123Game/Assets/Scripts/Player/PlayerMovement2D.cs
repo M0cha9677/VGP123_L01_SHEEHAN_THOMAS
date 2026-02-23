@@ -10,12 +10,15 @@ public class PlayerMovement2D : MonoBehaviour
     public float moveSpeed = 5f;
     public float jumpForce = 10f;
     public float groundCheckRadius = 0.02f;
+
+    private float _firePointAbsX;
     public bool FacingRight => !_sr.flipX;
 
     private Rigidbody2D _rb;
     private Collider2D _collider;
     private SpriteRenderer _sr;
     private Animator _anim;
+    [SerializeField] private Transform _firepoint;
 
     private bool _isGrounded = false;
     private Vector2 groundCheckPos => CalculateGroundCheck();
@@ -25,12 +28,15 @@ public class PlayerMovement2D : MonoBehaviour
         return new Vector2(bounds.center.x, bounds.min.y);
     }
 
-    void Start()
+    void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _collider = GetComponent<Collider2D>();
         _sr = GetComponent<SpriteRenderer>();
         _anim = GetComponent<Animator>();
+
+        if (_firepoint != null)
+            _firePointAbsX = Mathf.Abs(_firepoint.localPosition.x);
 
 
         //if (groundCheckTransform == null) 
@@ -62,10 +68,21 @@ public class PlayerMovement2D : MonoBehaviour
         _anim.SetFloat("moveInput", Mathf.Abs(horizontalInput));
         _anim.SetBool("isGrounded", _isGrounded);
         _anim.SetFloat("yVel", _rb.linearVelocity.y);
-        
+
 
     }
 
 
-    private void SpriteFlip(float horizontalInput) => _sr.flipX = (horizontalInput < 0);
+    private void SpriteFlip(float horizontalInput)
+    {
+        bool facingLeft = horizontalInput < 0f;
+        _sr.flipX = facingLeft;
+
+        if (_firepoint != null)
+        {
+            Vector3 p = _firepoint.localPosition;
+            p.x = facingLeft ? -_firePointAbsX : _firePointAbsX;
+            _firepoint.localPosition = p;
+        }
+    }
 }

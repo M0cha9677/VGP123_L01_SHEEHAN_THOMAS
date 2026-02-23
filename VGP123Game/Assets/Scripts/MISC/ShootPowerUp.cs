@@ -6,13 +6,18 @@ public class ShootPowerUp : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        var shoot = other.GetComponent<PlayerShoot>();
-        if (shoot != null )
+        PlayerShoot shooter = other.GetComponent<PlayerShoot>();
+
+        if (shooter != null)
         {
-            //shoot.EnableShooting();
+            shooter.EnableShooting();
+            Debug.Log("Player picked up shooting power-up.");
+        }
+        else
+        {
+            Debug.LogWarning("PlayerShoot component not found on player.");
         }
 
         Destroy(gameObject);
-
     }
 }

@@ -4,28 +4,32 @@ public class Projectile2D : MonoBehaviour
 {
     [SerializeField] private float speed = 12f;
     [SerializeField] private float lifeTime = 2f;
-    [SerializeField] private int damage = 1;
 
-    private Rigidbody2D rb;
+    private Rigidbody2D _rb;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
     }
 
-    public void Fire(Vector2 direction)
+    public void Fire(Vector2 dir)
     {
-        direction = direction.normalized;
-        rb.linearVelocity = direction * speed;
+        _rb.linearVelocity = dir.normalized * speed;
         Destroy(gameObject, lifeTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        //var enemy = other.GetComponent<EnemyHealth>();
-        //if (enemy != null) enemy.TakeDamage(damage);
+        Debug.Log("Projectile hit: " + other.name + " | tag=" + other.tag + " | layer=" + LayerMask.LayerToName(other.gameObject.layer));
 
+        // Ignore these entirely
         if (other.CompareTag("Player")) return;
+        if (other.CompareTag("MainCamera")) return;
+
+        if (other.CompareTag("Collectible")) return;
+        if (other.CompareTag("PowerUp")) return;
+
+        // Anything else = destroy projectile
         Destroy(gameObject);
     }
     void Start()
