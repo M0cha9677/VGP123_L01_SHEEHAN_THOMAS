@@ -170,6 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   collectiblePrefabs:
   - {fileID: 685513451}
+  - {fileID: 521593195}
   spawnPoints:
   - {fileID: 821043631}
   - {fileID: 929034310}
