@@ -5,58 +5,67 @@ using UnityEngine;
 
 public class PlayerMovement2D : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    [Header("Movement")]
-    public float moveSpeed = 7f;
-    public float jumpForce = 12f;
+    public LayerMask groundLayer;
 
-    [Header("Ground Check")]
-    public Transform groundCheck; // Empty child at feet
-    public float groundCheckRadius = 0.15f;
-    public LayerMask groundLayer; // Set to Ground Layer
+    public float moveSpeed = 5f;
+    public float jumpForce = 10f;
+    public float groundCheckRadius = 0.02f;
+    public bool FacingRight => !_sr.flipX;
 
-    private Rigidbody2D rb;
-    private float moveInput;
-    private bool isGrounded = false;
-    private PlayerFacing facing;
-    private Animator anim;
+    private Rigidbody2D _rb;
+    private Collider2D _collider;
+    private SpriteRenderer _sr;
+    private Animator _anim;
 
-    private void Awake()
+    private bool _isGrounded = false;
+    private Vector2 groundCheckPos => CalculateGroundCheck();
+    private Vector2 CalculateGroundCheck()
     {
-        rb = GetComponent<Rigidbody2D>();
-        facing = GetComponent<PlayerFacing>();
+        Bounds bounds = _collider.bounds;
+        return new Vector2(bounds.center.x, bounds.min.y);
     }
 
-    private void Update()
-    {
-        moveInput = Input.GetAxisRaw("Horizontal"); // A/D or Left/Right
-        facing.SetFacingFromInput(moveInput);
-
-        // Ground Check
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-
-        // Jump
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f); // consistent jump
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
-
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        if (groundCheck == null) return;
-        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-    }
-    
     void Start()
     {
+        _rb = GetComponent<Rigidbody2D>();
+        _collider = GetComponent<Collider2D>();
+        _sr = GetComponent<SpriteRenderer>();
+        _anim = GetComponent<Animator>();
+
+
+        //if (groundCheckTransform == null) 
+        //{
+        //      groundCheckTransform = new GameObject("GroundCheck");
+        //      groundCheckTransform.transform.SetParent(transform);
+        //      groundCheckTransform.transform.localPosition = Vector3.zero
+        //}
+    }
+
+    void Update()
+    {
+        _isGrounded = Physics2D.OverlapCircle(groundCheckPos, groundCheckRadius, groundLayer);
+
+        float horizontalInput = Input.GetAxis("Horizontal");
+        bool jumpInput = Input.GetButtonDown("Jump");
+
+        Vector2 velocity = _rb.linearVelocity;
+        velocity.x = horizontalInput * moveSpeed;
+        _rb.linearVelocity = velocity;
+
+        if (horizontalInput != 0) SpriteFlip(horizontalInput);
+
+        if (jumpInput && _isGrounded)
+        {
+            _rb.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
+        }
+
+        _anim.SetFloat("moveInput", Mathf.Abs(horizontalInput));
+        _anim.SetBool("isGrounded", _isGrounded);
+        _anim.SetFloat("yVel", _rb.linearVelocity.y);
+        
 
     }
+
+
+    private void SpriteFlip(float horizontalInput) => _sr.flipX = (horizontalInput < 0);
 }

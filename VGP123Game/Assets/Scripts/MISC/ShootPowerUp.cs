@@ -9,7 +9,7 @@ public class ShootPowerUp : MonoBehaviour
         var shoot = other.GetComponent<PlayerShoot>();
         if (shoot != null )
         {
-            shoot.EnableShooting();
+            //shoot.EnableShooting();
         }
 
         Destroy(gameObject);
